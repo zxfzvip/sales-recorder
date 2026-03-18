@@ -69,6 +69,24 @@ for row in range(2, 110):
         next_row = row
         break
 
+# 如果是录入快递，检查上一行是否已经有快递记录
+# 上一行有快递（F列和G列都有值），就往下再找一行
+if expr_count and next_row > 2:
+    prev_expr_count = ws.cell(next_row - 1, 6).value
+    prev_expr_price = ws.cell(next_row - 1, 7).value
+    if prev_expr_count is not None and prev_expr_price is not None:
+        # 上一行已有快递，继续往下找空行
+        for row in range(next_row + 1, 110):
+            has_real_data = False
+            for col in range(1, 9):
+                val = ws.cell(row, col).value
+                if val is not None and not (isinstance(val, str) and val.startswith('=')):
+                    has_real_data = True
+                    break
+            if not has_real_data:
+                next_row = row
+                break
+
 # 写入数据
 ws.cell(next_row, 2).value = product  # 商品
 ws.cell(next_row, 3).value = qty      # 数量
